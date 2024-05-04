@@ -1,0 +1,52 @@
+{
+  "name": "pdf-to-speech",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:dev": "node --inspect --no-warnings=ExperimentalWarning --experimental-specifier-resolution=node --loader ts-node/esm/transpile-only src/index.ts",
+    "build": "tsc --build tsconfig.prod.json",
+    "build:dev": "tsc --build tsconfig.dev.json",
+    "test:unit": "vitest .unit.test.ts --config vitest.unit.config.js",
+    "test:unit:run": "npm run test:unit -- --run",
+    "test:integration": "NODE_ENV=test vitest --config vitest.integration.config.js .integration.test.ts",
+    "test:integration:run": "npm run test:integration -- --run",
+    "lint": "eslint . --ext .ts --cache --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "dependencies": {
+    "@fastify/cors": "9.0.1",
+    "@fastify/helmet": "11.1.1",
+    "@fastify/multipart": "8.2.0",
+    "@fastify/swagger": "8.14.0",
+    "@fastify/swagger-ui": "3.0.0",
+    "@fastify/type-provider-typebox": "4.0.0",
+    "@sinclair/typebox": "0.32.20",
+    "config": "3.3.11",
+    "fastify": "4.26.2",
+    "pino": "8.20.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "8.4.1",
+    "@types/config": "3.3.4",
+    "@types/node": "20.12.7",
+    "@typescript-eslint/eslint-plugin": "7.7.0",
+    "@typescript-eslint/parser": "7.7.0",
+    "esbuild": "0.20.2",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-import-resolver-typescript": "3.6.1",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-prettier": "5.1.3",
+    "prettier": "3.2.5",
+    "prettier-eslint": "16.3.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.4.5",
+    "vitest": "1.5.0"
+  },
+  "volta": {
+    "node": "20.11.1"
+  },
+  "engines": {
+    "node": "20.11.1"
+  }
+}
