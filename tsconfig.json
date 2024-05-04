@@ -37,7 +37,6 @@
       "**/dist",
       "**/build",
       "**/.eslintcache",
-      "**/.turbo",
       "node_modules",
       "build",
       "dist"

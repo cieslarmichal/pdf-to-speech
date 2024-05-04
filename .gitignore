@@ -18,8 +18,6 @@ coverage
 
 .tsbuildinfo
 
-.turbo
-
 !.gitkeep
 
 **/local.json

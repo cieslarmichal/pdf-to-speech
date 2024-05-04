@@ -128,7 +128,11 @@
     ],
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/explicit-function-return-type": ["error"],
+    "@typescript-eslint/explicit-function-return-type": ["error",   {
+      "allowExpressions": false,
+      "allowTypedFunctionExpressions": false,
+      "allowHigherOrderFunctions": false
+    }],
     "eol-last": ["error", "always"],
     "brace-style": ["error", "1tbs"],
     "arrow-parens": ["error", "always"],
