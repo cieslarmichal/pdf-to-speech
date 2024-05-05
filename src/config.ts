@@ -1,7 +1,8 @@
 import { type Static, Type } from '@sinclair/typebox';
-import { Value } from '@sinclair/typebox/value';
+import { Value, TransformDecodeCheckError } from '@sinclair/typebox/value';
 import config from 'config';
 
+import { ConfigurationError } from './common/errors/configurationError.js';
 import { LogLevel } from './common/logger/logLevel.js';
 
 const configSchema = Type.Object({
@@ -19,6 +20,14 @@ export type Config = Static<typeof configSchema>;
 
 export class ConfigFactory {
   public static create(): Config {
-    return Value.Decode(configSchema, config);
+    try {
+      return Value.Decode(configSchema, config);
+    } catch (error) {
+      if (error instanceof TransformDecodeCheckError) {
+        throw new ConfigurationError({ reason: error.error });
+      }
+
+      throw error;
+    }
   }
 }
