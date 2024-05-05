@@ -1,15 +1,12 @@
 import { Application } from './application.js';
-import { ConfigFactory } from './config.js';
 
-const finalErrorHandler = async (error: Error): Promise<void> => {
+const finalErrorHandler = async (error: unknown): Promise<void> => {
   console.error({
     message: 'Application error.',
     error,
   });
 
-  if (application) {
-    await application.stop();
-  }
+  await application?.stop();
 
   process.exitCode = 1;
 };
@@ -25,14 +22,11 @@ process.on('SIGTERM', finalErrorHandler);
 let application: Application | undefined;
 
 try {
-  const config = ConfigFactory.create();
-
-  application = new Application(config);
+  application = new Application();
 
   await application.start();
 } catch (error) {
-  console.error(error);
-
-  process.exit(1);
+  await finalErrorHandler(error);
 } finally {
+  await application?.stop();
 }
