@@ -6,6 +6,8 @@ import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { type TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { fastify, type FastifyInstance } from 'fastify';
 
+import { ConvertRoute } from './api/routes/convertRoute.js';
+import { HealthRoute } from './api/routes/healthRoute.js';
 import { BaseError } from './common/errors/baseError.js';
 import { InputNotValidError } from './common/errors/inputNotValidError.js';
 import { HttpStatusCode } from './common/http/httpStatusCode.js';
@@ -19,7 +21,10 @@ export class HttpServer {
     private readonly logger: Logger,
     private readonly config: Config,
   ) {
-    this.fastifyServer = fastify({ bodyLimit: 10 * 1024 * 1024 }).withTypeProvider<TypeBoxTypeProvider>();
+    this.fastifyServer = fastify({
+      bodyLimit: 10 * 1024 * 1024,
+      logger: true,
+    }).withTypeProvider<TypeBoxTypeProvider>();
   }
 
   public async start(): Promise<void> {
@@ -39,8 +44,15 @@ export class HttpServer {
       allowedHeaders: '*',
     });
 
-    this.fastifyServer.get('/health', async (request, reply): Promise<void> => {
-      reply.send({ healthy: true });
+    const routes = [new HealthRoute(), new ConvertRoute(this.logger)];
+
+    routes.forEach((route): void => {
+      this.fastifyServer.route({
+        method: route.method,
+        url: route.url,
+        handler: route.handler.bind(route),
+        schema: route.schema,
+      });
     });
 
     await this.fastifyServer.listen({
