@@ -10,7 +10,10 @@ export class Application {
   public async start(): Promise<void> {
     const config = ConfigFactory.create();
 
-    this.logger = LoggerFactory.create({ logLevel: config.logLevel });
+    this.logger = LoggerFactory.create({
+      logLevel: config.logLevel,
+      applicationName: config.application.name,
+    });
 
     this.httpServer = new HttpServer(this.logger, config);
 

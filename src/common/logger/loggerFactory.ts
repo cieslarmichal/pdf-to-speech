@@ -4,6 +4,7 @@ import { Logger } from './logger.js';
 import { type LogLevel } from './logLevel.js';
 
 interface LoggerConfig {
+  readonly applicationName: string;
   readonly logLevel: LogLevel;
 }
 
@@ -12,7 +13,7 @@ export class LoggerFactory {
     const { req, res, err } = pino.stdSerializers;
 
     const logger = pino({
-      name: 'pdf-to-speech',
+      name: config.applicationName,
       level: config.logLevel,
       serializers: {
         req,

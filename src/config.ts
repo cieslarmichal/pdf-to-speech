@@ -6,6 +6,9 @@ import { ConfigurationError } from './common/errors/configurationError.js';
 import { LogLevel } from './common/logger/logLevel.js';
 
 const configSchema = Type.Object({
+  application: Type.Object({
+    name: Type.String({ minLength: 1 }),
+  }),
   server: Type.Object({
     host: Type.String({ minLength: 1 }),
     port: Type.Number({
