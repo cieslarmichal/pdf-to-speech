@@ -39,6 +39,10 @@ export class HttpServer {
       allowedHeaders: '*',
     });
 
+    this.fastifyServer.get('/health', async (request, reply): Promise<void> => {
+      reply.send({ healthy: true });
+    });
+
     await this.fastifyServer.listen({
       port,
       host,
@@ -72,7 +76,7 @@ export class HttpServer {
       }
 
       this.logger.error({
-        message: 'Caught an error in the HTTP server.',
+        message: 'HTTP server error.',
         error,
         endpoint: `${request.method} ${request.url}`,
         statusCode: reply.statusCode,
