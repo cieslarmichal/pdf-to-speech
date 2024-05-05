@@ -1,23 +1,27 @@
 import { Application } from './application.js';
 
+const finalCleanup = async (): Promise<void> => {
+  await application?.stop();
+
+  process.exitCode = 1;
+};
+
 const finalErrorHandler = async (error: unknown): Promise<void> => {
   console.error({
     message: 'Application error.',
     error,
   });
 
-  await application?.stop();
-
-  process.exitCode = 1;
+  await finalCleanup();
 };
 
 process.on('unhandledRejection', finalErrorHandler);
 
 process.on('uncaughtException', finalErrorHandler);
 
-process.on('SIGINT', finalErrorHandler);
+process.on('SIGINT', finalCleanup);
 
-process.on('SIGTERM', finalErrorHandler);
+process.on('SIGTERM', finalCleanup);
 
 let application: Application | undefined;
 
@@ -27,6 +31,4 @@ try {
   await application.start();
 } catch (error) {
   await finalErrorHandler(error);
-} finally {
-  await application?.stop();
 }

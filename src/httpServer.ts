@@ -59,18 +59,10 @@ export class HttpServer {
       port,
       host,
     });
-
-    this.logger.info({
-      message: 'HTTP Server started.',
-      port,
-      host,
-    });
   }
 
   public async stop(): Promise<void> {
     await this.fastifyServer.close();
-
-    this.logger.info({ message: 'HTTP Server stopped.' });
   }
 
   private setupErrorHandler(): void {

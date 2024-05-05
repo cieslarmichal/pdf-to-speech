@@ -17,12 +17,10 @@ export class Application {
 
     this.httpServer = new HttpServer(this.logger, config);
 
-    this.logger.info({ message: 'Application started.' });
+    await this.httpServer.start();
   }
 
   public async stop(): Promise<void> {
     await this.httpServer?.stop();
-
-    this.logger?.info({ message: 'Application stopped.' });
   }
 }
