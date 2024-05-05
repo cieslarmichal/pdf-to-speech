@@ -27,7 +27,7 @@ export class ConfigFactory {
       return Value.Decode(configSchema, config);
     } catch (error) {
       if (error instanceof TransformDecodeCheckError) {
-        throw new ConfigurationError({ reason: error.error });
+        throw new ConfigurationError({ ...error.error });
       }
 
       throw error;

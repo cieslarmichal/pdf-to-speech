@@ -1,4 +1,5 @@
 import { Application } from './application.js';
+import { BaseError } from './common/errors/baseError.js';
 
 const finalCleanup = async (): Promise<void> => {
   await application?.stop();
@@ -7,9 +8,19 @@ const finalCleanup = async (): Promise<void> => {
 };
 
 const finalErrorHandler = async (error: unknown): Promise<void> => {
+  let formattedError = error;
+
+  if (error instanceof Error) {
+    formattedError = {
+      name: error.name,
+      message: error.message,
+      ...(error instanceof BaseError ? { ...error.context } : undefined),
+    };
+  }
+
   console.error({
     message: 'Application error.',
-    error,
+    error: formattedError,
   });
 
   await finalCleanup();
