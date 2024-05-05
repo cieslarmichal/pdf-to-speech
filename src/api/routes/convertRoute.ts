@@ -1,4 +1,5 @@
-import { type FastifyReply, type FastifyRequest } from 'fastify';
+import { Type } from '@sinclair/typebox';
+import { type FastifySchema, type FastifyReply, type FastifyRequest } from 'fastify';
 import { createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream';
 import { promisify } from 'node:util';
@@ -14,7 +15,22 @@ const streamPipeline = promisify(pipeline);
 export class ConvertRoute implements Route {
   public readonly method = HttpMethod.post;
   public readonly url = '/convert';
-  public readonly schema = {};
+  public readonly schema: FastifySchema = {
+    response: {
+      [HttpStatusCode.ok]: Type.Object(
+        {
+          path: Type.String(),
+        },
+        { description: 'Converted file successfully' },
+      ),
+      [HttpStatusCode.badRequest]: Type.Object(
+        {
+          error: Type.String(),
+        },
+        { description: 'Invalid file' },
+      ),
+    },
+  };
 
   public constructor(private readonly logger: Logger) {}
 
@@ -34,6 +50,11 @@ export class ConvertRoute implements Route {
     }
 
     const filePath = `/tmp/${uuid4}`;
+
+    this.logger.info({
+      message: 'Converting file',
+      filePath,
+    });
 
     await streamPipeline(multipartFile.file, createWriteStream(filePath));
 
