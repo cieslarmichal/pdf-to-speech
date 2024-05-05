@@ -23,6 +23,7 @@
     "@sinclair/typebox": "0.32.20",
     "config": "3.3.11",
     "fastify": "4.26.2",
+    "http-status-codes": "2.3.0",
     "pino": "8.20.0"
   },
   "devDependencies": {
