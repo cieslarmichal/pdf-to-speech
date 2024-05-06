@@ -130,7 +130,7 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/explicit-function-return-type": ["error",   {
       "allowExpressions": false,
-      "allowTypedFunctionExpressions": false,
+      "allowTypedFunctionExpressions": true,
       "allowHigherOrderFunctions": false
     }],
     "eol-last": ["error", "always"],

@@ -51,7 +51,10 @@ export class HttpServer {
         method: route.method,
         url: route.url,
         handler: route.handler.bind(route),
-        schema: route.schema,
+        schema: {
+          description: route.description,
+          ...route.schema,
+        },
       });
     });
 
