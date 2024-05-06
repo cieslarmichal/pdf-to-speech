@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { fastifyCors } from '@fastify/cors';
 import { fastifyHelmet } from '@fastify/helmet';
 import { fastifyMultipart } from '@fastify/multipart';
@@ -21,10 +22,7 @@ export class HttpServer {
     private readonly logger: Logger,
     private readonly config: Config,
   ) {
-    this.fastifyServer = fastify({
-      bodyLimit: 10 * 1024 * 1024,
-      logger: true,
-    }).withTypeProvider<TypeBoxTypeProvider>();
+    this.fastifyServer = fastify({ bodyLimit: 10 * 1024 * 1024 }).withTypeProvider<TypeBoxTypeProvider>();
   }
 
   public async start(): Promise<void> {
@@ -44,6 +42,25 @@ export class HttpServer {
       allowedHeaders: '*',
     });
 
+    this.fastifyServer.addHook('onRequest', (request, _reply, done) => {
+      this.logger.info({
+        message: 'HTTP request received.',
+        endpoint: `${request.method} ${request.url}`,
+      });
+
+      done();
+    });
+
+    this.fastifyServer.addHook('onSend', (request, reply, _payload, done) => {
+      this.logger.info({
+        message: 'HTTP response sent.',
+        endpoint: `${request.method} ${request.url}`,
+        statusCode: reply.statusCode,
+      });
+
+      done();
+    });
+
     const routes = [new HealthRoute(), new ConvertRoute(this.logger)];
 
     routes.forEach((route): void => {
@@ -61,6 +78,12 @@ export class HttpServer {
     await this.fastifyServer.listen({
       port,
       host,
+    });
+
+    this.logger.info({
+      message: 'HTTP server started.',
+      host,
+      port,
     });
   }
 
