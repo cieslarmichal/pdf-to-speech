@@ -1,22 +1,22 @@
-import { type Logger } from './common/logger/logger.js';
 import { LoggerFactory } from './common/logger/loggerFactory.js';
 import { ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
 
 export class Application {
-  private logger: Logger | undefined;
-  private httpServer: HttpServer | undefined;
+  private httpServer: HttpServer;
 
-  public async start(): Promise<void> {
+  public constructor() {
     const config = ConfigFactory.create();
 
-    this.logger = LoggerFactory.create({
+    const logger = LoggerFactory.create({
       logLevel: config.logLevel,
       applicationName: config.application.name,
     });
 
-    this.httpServer = new HttpServer(this.logger, config);
+    this.httpServer = new HttpServer(logger, config);
+  }
 
+  public async start(): Promise<void> {
     await this.httpServer.start();
   }
 
