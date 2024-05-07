@@ -51,7 +51,7 @@ export class ConvertRoute implements Route {
       return;
     }
 
-    const filePath = `/tmp/${uuid4}`;
+    const filePath = `/tmp/${uuid4()}`;
 
     this.logger.info({
       message: 'Converting file',
@@ -60,6 +60,6 @@ export class ConvertRoute implements Route {
 
     await streamPipeline(multipartFile.file, createWriteStream(filePath));
 
-    reply.code(HttpStatusCode.ok).send({ filePath });
+    reply.code(HttpStatusCode.ok).send({ path: filePath });
   }
 }

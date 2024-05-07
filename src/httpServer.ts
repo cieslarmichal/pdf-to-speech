@@ -93,21 +93,27 @@ export class HttpServer {
 
   private setupErrorHandler(): void {
     this.fastifyServer.setErrorHandler((error, request, reply): void => {
-      const formattedError = {
+      const responseError = {
         name: error.name,
         message: error.message,
         ...(error instanceof BaseError ? { ...error.context } : undefined),
       };
 
       if (error instanceof InputNotValidError) {
-        reply.status(HttpStatusCode.badRequest).send(formattedError);
+        reply.status(HttpStatusCode.badRequest).send(responseError);
       } else {
-        reply.status(HttpStatusCode.internalServerError).send(formattedError);
+        reply.status(HttpStatusCode.internalServerError).send(responseError);
       }
+
+      const debugError = {
+        ...responseError,
+        stack: error.stack,
+        cause: error.cause,
+      };
 
       this.logger.error({
         message: 'HTTP server error.',
-        error,
+        error: debugError,
         endpoint: `${request.method} ${request.url}`,
         statusCode: reply.statusCode,
       });
