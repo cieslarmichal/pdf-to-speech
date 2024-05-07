@@ -13,4 +13,4 @@ RUN npm run build
 
 USER node
 
-CMD node src/index.js
+CMD node dist/src/index.js
