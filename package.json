@@ -24,7 +24,7 @@
     "config": "3.3.11",
     "fastify": "4.26.2",
     "http-status-codes": "2.3.0",
-    "pdf.js-extract": "0.2.1",
+    "pdf-parse": "1.1.1",
     "pino": "8.20.0",
     "uuid": "9.0.1"
   },
@@ -32,6 +32,7 @@
     "@faker-js/faker": "8.4.1",
     "@types/config": "3.3.4",
     "@types/node": "20.12.7",
+    "@types/pdf-parse": "1.1.4",
     "@types/uuid": "9.0.8",
     "@typescript-eslint/eslint-plugin": "7.7.0",
     "@typescript-eslint/parser": "7.7.0",

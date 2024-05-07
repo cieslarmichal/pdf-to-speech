@@ -1,30 +1,33 @@
-import { PDFExtract } from 'pdf.js-extract';
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { readFileSync } from 'node:fs';
+
+const pdf = require('pdf-parse');
 
 interface ParsePdfPayload {
   readonly pdfPath: string;
 }
 
 export class PdfParserService {
-  private readonly pdfExtract: PDFExtract;
-
-  public constructor() {
-    this.pdfExtract = new PDFExtract();
-  }
-
   public async parsePdf(payload: ParsePdfPayload): Promise<string> {
     const { pdfPath } = payload;
 
-    const extractedData = await this.pdfExtract.extract(pdfPath);
+    console.log({ pdfPath });
 
-    extractedData.pages.forEach((page) => {
-      page.content.forEach((content) => {
-        console.log({
-          x: content.x,
-          y: content.y,
-          str: content.str,
-        });
-      });
-    });
+    const dataBuffer = readFileSync(pdfPath);
+
+    const extractedData = await pdf(dataBuffer);
+
+    console.log(extractedData.text);
+
+    // extractedData.text.forEach((page) => {
+    //   page.content.forEach((content) => {
+    //     console.log({
+    //       x: content.x,
+    //       y: content.y,
+    //       str: content.str,
+    //     });
+    //   });
+    // });
 
     return 'parsed pdf';
   }
