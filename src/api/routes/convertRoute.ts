@@ -60,6 +60,6 @@ export class ConvertRoute implements Route {
 
     await streamPipeline(multipartFile.file, createWriteStream(filePath));
 
-    reply.send({ filePath });
+    reply.code(HttpStatusCode.ok).send({ filePath });
   }
 }

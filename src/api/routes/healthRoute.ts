@@ -23,6 +23,6 @@ export class HealthRoute implements Route {
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public async handler(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    reply.send({ healthy: true });
+    reply.status(HttpStatusCode.ok).send({ healthy: true });
   }
 }
