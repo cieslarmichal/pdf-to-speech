@@ -1,5 +1,9 @@
 import { PDFExtract } from 'pdf.js-extract';
 
+interface ParsePdfPayload {
+  readonly pdfPath: string;
+}
+
 export class PdfParserService {
   private readonly pdfExtract: PDFExtract;
 
@@ -7,7 +11,9 @@ export class PdfParserService {
     this.pdfExtract = new PDFExtract();
   }
 
-  public async parsePdf(pdfPath: string): Promise<string> {
+  public async parsePdf(payload: ParsePdfPayload): Promise<string> {
+    const { pdfPath } = payload;
+
     const extractedData = await this.pdfExtract.extract(pdfPath);
 
     extractedData.pages.forEach((page) => {

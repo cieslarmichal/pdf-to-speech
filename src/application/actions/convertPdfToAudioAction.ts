@@ -23,7 +23,7 @@ export class ConvertPdfToAudioAction {
       pdfPath,
     });
 
-    const parsedPdf = await this.pdfParserService.parsePdf(pdfPath);
+    const parsedPdf = await this.pdfParserService.parsePdf({ pdfPath });
 
     console.log(parsedPdf);
 
