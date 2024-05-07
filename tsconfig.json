@@ -31,15 +31,4 @@
     "composite": true
   },
   "references": [],
-  "watchOptions": {
-    "excludeDirectories": [
-      "**/node_modules",
-      "**/dist",
-      "**/build",
-      "**/.eslintcache",
-      "node_modules",
-      "build",
-      "dist"
-    ]
-  }
 }
