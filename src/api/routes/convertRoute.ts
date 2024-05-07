@@ -51,6 +51,18 @@ export class ConvertRoute implements Route {
       return;
     }
 
+    if (multipartFile.mimetype !== 'application/pdf') {
+      reply.code(HttpStatusCode.badRequest).send({ error: 'Invalid file type.' });
+
+      return;
+    }
+
+    if (!multipartFile.filename.endsWith('.pdf')) {
+      reply.code(HttpStatusCode.badRequest).send({ error: 'Invalid file extension.' });
+
+      return;
+    }
+
     const filePath = `/tmp/${uuid4()}`;
 
     this.logger.info({
