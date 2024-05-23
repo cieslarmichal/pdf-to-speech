@@ -53,7 +53,7 @@ describe('PdfParserService', () => {
 
     const result = await pdfParserService.parsePdf({ pdfPath: onePagePdfPath });
 
-    expect(result).toEqual(expectedOnePagePdfText);
+    expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedOnePagePdfText));
   });
 
   // it('throws an error when a Subscription does not exist', async () => {

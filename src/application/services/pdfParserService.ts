@@ -32,8 +32,31 @@ export class PdfParserService {
     let parsed = '';
 
     for (const page of output.Pages) {
+      let previousY = 0;
+
+      let previousText = '';
+
       for (const text of page.Texts) {
+        console.log({
+          y: text.y,
+          t: decodeURIComponent(text.R[0]?.T as string),
+        });
+
+        console.log({ previousText });
+
+        if (previousText.endsWith('. ') && text.y > previousY) {
+          parsed = parsed.slice(0, -1);
+        }
+
+        if (text.y > previousY) {
+          parsed += '\n';
+        }
+
+        previousY = text.y;
+
         parsed += text.R.map((text) => decodeURIComponent(text.T)).join('');
+
+        previousText = decodeURIComponent(text.R[text.R.length - 1]?.T as string);
       }
     }
 
