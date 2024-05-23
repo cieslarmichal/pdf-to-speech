@@ -16,7 +16,7 @@ export class PdfParserService {
 
     await pdfParser.loadPDF(pdfPath);
 
-    const result = await new Promise<Output>((resolve, reject) => {
+    const output = await new Promise<Output>((resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pdfParser.on('pdfParser_dataError', (errData: any) => {
         console.error(errData.parserError);
@@ -29,12 +29,14 @@ export class PdfParserService {
       });
     });
 
-    console.log(result.Pages[0]?.Texts[1]);
+    let parsed = '';
 
-    console.log(result.Pages[0]?.Texts[2]);
+    for (const page of output.Pages) {
+      for (const text of page.Texts) {
+        parsed += text.R.map((text) => decodeURIComponent(text.T)).join('');
+      }
+    }
 
-    console.log(result.Pages[0]?.Texts[3]);
-
-    return 'parsed pdf';
+    return parsed;
   }
 }
