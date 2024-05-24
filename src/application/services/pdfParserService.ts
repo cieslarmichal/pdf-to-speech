@@ -44,8 +44,8 @@ export class PdfParserService {
 
         console.log({ previousText });
 
-        if (previousText.endsWith('. ') && text.y > previousY) {
-          parsed = parsed.slice(0, -1);
+        if (previousText.endsWith(' ') && text.y > previousY) {
+          parsed = parsed.trimEnd();
         }
 
         if (text.y > previousY) {
@@ -54,12 +54,28 @@ export class PdfParserService {
 
         previousY = text.y;
 
-        parsed += text.R.map((text) => decodeURIComponent(text.T)).join('');
+        parsed += text.R.map((text) => this.replaceEnglishLigatures(decodeURIComponent(text.T))).join('');
 
         previousText = decodeURIComponent(text.R[text.R.length - 1]?.T as string);
       }
     }
 
     return parsed;
+  }
+
+  private replaceEnglishLigatures(input: string): string {
+    const ligatures = new Map<string, string>([
+      ['Æ', 'AE'],
+      ['æ', 'ae'],
+      ['Œ', 'OE'],
+      ['œ', 'oe'],
+      ['ﬁ', 'fi'],
+      ['ﬂ', 'fl'],
+      // add more English ligatures if needed
+    ]);
+
+    const ligatureRegex = new RegExp(Array.from(ligatures.keys()).join('|'), 'g');
+
+    return input.replace(ligatureRegex, (ligature) => ligatures.get(ligature) || '');
   }
 }
