@@ -41,6 +41,8 @@ amet diam suscipit mauris ornare aliquam. Sed varius. Duis arcu. Etiam tristique
 eget dui. Phasellus congue. Aenean est erat, tincidunt eget, venenatis quis, commodo at,
 quam.`;
 
+const expectedMultiPagePdfText = ``;
+
 describe('PdfParserService', () => {
   const pdfParserService: PdfParserService = new PdfParserService();
 
@@ -48,25 +50,17 @@ describe('PdfParserService', () => {
 
   const onePagePdfPath = path.join(resourcesDirectory, 'one-page.pdf');
 
-  it('parses one page file', async () => {
-    console.log({ examplePdfPath: onePagePdfPath });
+  const multiPagePdfPath = path.join(resourcesDirectory, 'multi-page.pdf');
 
+  it('parses one page file', async () => {
     const result = await pdfParserService.parsePdf({ pdfPath: onePagePdfPath });
 
     expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedOnePagePdfText));
   });
 
-  // it('throws an error when a Subscription does not exist', async () => {
-  //   const id = faker.string.uuid();
+  it('parses multi page file', async () => {
+    const result = await pdfParserService.parsePdf({ pdfPath: multiPagePdfPath });
 
-  //   try {
-  //     await pdfParserService.execute({ id });
-  //   } catch (error) {
-  //     expect(error).toBeDefined();
-
-  //     return;
-  //   }
-
-  //   expect.fail();
-  // });
+    expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedMultiPagePdfText));
+  });
 });

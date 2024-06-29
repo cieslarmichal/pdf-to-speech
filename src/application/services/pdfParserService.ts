@@ -71,7 +71,6 @@ export class PdfParserService {
       ['œ', 'oe'],
       ['ﬁ', 'fi'],
       ['ﬂ', 'fl'],
-      // add more English ligatures if needed
     ]);
 
     const ligatureRegex = new RegExp(Array.from(ligatures.keys()).join('|'), 'g');
