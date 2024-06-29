@@ -38,6 +38,7 @@ export class PdfParserService {
 
       for (const text of page.Texts) {
         console.log({
+          text,
           y: text.y,
           t: decodeURIComponent(text.R[0]?.T as string),
         });
@@ -49,12 +50,12 @@ export class PdfParserService {
         }
 
         if (text.y > previousY) {
-          parsed += '\n';
+          parsed += ' ';
         }
 
         previousY = text.y;
 
-        parsed += text.R.map((text) => this.replaceEnglishLigatures(decodeURIComponent(text.T))).join('');
+        parsed += text.R.map((text) => this.replaceSpecialCharacters(decodeURIComponent(text.T))).join('');
 
         previousText = decodeURIComponent(text.R[text.R.length - 1]?.T as string);
       }
@@ -63,7 +64,7 @@ export class PdfParserService {
     return parsed;
   }
 
-  private replaceEnglishLigatures(input: string): string {
+  private replaceSpecialCharacters(input: string): string {
     const ligatures = new Map<string, string>([
       ['Æ', 'AE'],
       ['æ', 'ae'],
@@ -71,6 +72,7 @@ export class PdfParserService {
       ['œ', 'oe'],
       ['ﬁ', 'fi'],
       ['ﬂ', 'fl'],
+      ['', ''],
     ]);
 
     const ligatureRegex = new RegExp(Array.from(ligatures.keys()).join('|'), 'g');
