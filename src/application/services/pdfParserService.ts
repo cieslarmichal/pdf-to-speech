@@ -12,7 +12,7 @@ export class PdfParserService {
 
     console.log({ pdfPath });
 
-    const pdfParser = new PDFParser(this, 1);
+    const pdfParser = new PDFParser(this, true);
 
     await pdfParser.loadPDF(pdfPath);
 
