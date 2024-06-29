@@ -1,12 +1,6 @@
 import { Application } from './application.js';
 import { BaseError } from './common/errors/baseError.js';
 
-const finalCleanup = async (): Promise<void> => {
-  await application?.stop();
-
-  process.exitCode = 1;
-};
-
 const finalErrorHandler = async (error: unknown): Promise<void> => {
   let formattedError = error;
 
@@ -25,16 +19,18 @@ const finalErrorHandler = async (error: unknown): Promise<void> => {
     }),
   );
 
-  await finalCleanup();
+  await application?.stop();
+
+  process.exitCode = 1;
 };
 
 process.on('unhandledRejection', finalErrorHandler);
 
 process.on('uncaughtException', finalErrorHandler);
 
-process.on('SIGINT', finalCleanup);
+process.on('SIGINT', finalErrorHandler);
 
-process.on('SIGTERM', finalCleanup);
+process.on('SIGTERM', finalErrorHandler);
 
 let application: Application | undefined;
 
