@@ -18,10 +18,12 @@ const finalErrorHandler = async (error: unknown): Promise<void> => {
     };
   }
 
-  console.error({
-    message: 'Application error.',
-    error: formattedError,
-  });
+  console.error(
+    JSON.stringify({
+      message: 'Application error.',
+      context: formattedError,
+    }),
+  );
 
   await finalCleanup();
 };
