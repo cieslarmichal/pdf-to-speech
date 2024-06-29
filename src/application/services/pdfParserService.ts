@@ -55,17 +55,36 @@ export class PdfParserService {
 
         previousY = text.y;
 
-        parsed += text.R.map((text) => this.replaceSpecialCharacters(decodeURIComponent(text.T))).join('');
+        const normalizedText = text.R.map((text) => this.normalizeText(text.T)).join('');
+
+        parsed += normalizedText;
 
         previousText = decodeURIComponent(text.R[text.R.length - 1]?.T as string);
       }
     }
 
-    return parsed;
+    return parsed.trim().replace(/\s+/g, ' ');
   }
 
-  private replaceSpecialCharacters(input: string): string {
-    const ligatures = new Map<string, string>([
+  private normalizeText(text: string): string {
+    const decodedText = decodeURIComponent(text);
+
+    const columnRegex = /Column \d+/g;
+
+    const rowRegex = /Row \d+/g;
+
+    let textWithoutForbiddenWords = decodedText.replace(columnRegex, '').replace(rowRegex, '');
+
+    // Check if the text contains only numbers (possibly with spaces)
+    if (/^\s*\d+\s*$/.test(textWithoutForbiddenWords)) {
+      textWithoutForbiddenWords = '';
+    }
+
+    return this.replaceSpecialCharacters(textWithoutForbiddenWords);
+  }
+
+  private replaceSpecialCharacters(text: string): string {
+    const specialCharactersMapping = new Map<string, string>([
       ['Æ', 'AE'],
       ['æ', 'ae'],
       ['Œ', 'OE'],
@@ -75,8 +94,8 @@ export class PdfParserService {
       ['', ''],
     ]);
 
-    const ligatureRegex = new RegExp(Array.from(ligatures.keys()).join('|'), 'g');
+    const specialCharactersRegex = new RegExp(Array.from(specialCharactersMapping.keys()).join('|'), 'g');
 
-    return input.replace(ligatureRegex, (ligature) => ligatures.get(ligature) || '');
+    return text.replace(specialCharactersRegex, (character) => specialCharactersMapping.get(character) || '');
   }
 }
