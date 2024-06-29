@@ -6,6 +6,7 @@ import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { type TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { fastify, type FastifyInstance } from 'fastify';
+import { type FastifySchemaValidationError } from 'fastify/types/schema.js';
 
 import { ConvertRoute } from './api/routes/convertRoute.js';
 import { HealthRoute } from './api/routes/healthRoute.js';
@@ -92,6 +93,15 @@ export class HttpServer {
   }
 
   private setupErrorHandler(): void {
+    this.fastifyServer.setSchemaErrorFormatter((errors, dataVar) => {
+      const { instancePath, message } = errors[0] as FastifySchemaValidationError;
+
+      return new InputNotValidError({
+        reason: `${dataVar}${instancePath} ${message}`,
+        value: undefined,
+      });
+    });
+
     this.fastifyServer.setErrorHandler((error, request, reply): void => {
       const responseError = {
         name: error.name,
