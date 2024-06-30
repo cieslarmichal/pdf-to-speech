@@ -10,8 +10,6 @@ export class PdfParserService {
   public async parsePdf(payload: ParsePdfPayload): Promise<string> {
     const { pdfPath } = payload;
 
-    console.log({ pdfPath });
-
     const pdfParser = new PDFParser(this, true);
 
     await pdfParser.loadPDF(pdfPath);
@@ -61,6 +59,8 @@ export class PdfParserService {
 
         previousText = decodeURIComponent(text.R[text.R.length - 1]?.T as string);
       }
+
+      console.log({ parsed });
     }
 
     return parsed.trim().replace(/\s+/g, ' ');
@@ -69,18 +69,18 @@ export class PdfParserService {
   private normalizeText(text: string): string {
     const decodedText = decodeURIComponent(text);
 
-    const columnRegex = /Column \d+/g;
-
-    const rowRegex = /Row \d+/g;
-
-    let textWithoutForbiddenWords = decodedText.replace(columnRegex, '').replace(rowRegex, '');
+    const cleanedText = decodedText
+      .replace(/Column \d+/g, '') // Column 1, Column 2, etc.
+      .replace(/Row \d+/g, '') // Row 1, Row 2, etc.
+      .replace(/Table \d+/g, '') // Table 1, Table 2, etc.
+      .replace(/\[\d+\]/g, ''); // [1], [2], etc.
 
     // Check if the text contains only numbers (possibly with spaces)
-    if (/^\s*\d+\s*$/.test(textWithoutForbiddenWords)) {
-      textWithoutForbiddenWords = '';
+    if (/^\s*\d+\s*$/.test(cleanedText)) {
+      return '';
     }
 
-    return this.replaceSpecialCharacters(textWithoutForbiddenWords);
+    return this.replaceSpecialCharacters(cleanedText);
   }
 
   private replaceSpecialCharacters(text: string): string {
@@ -92,9 +92,24 @@ export class PdfParserService {
       ['ﬁ', 'fi'],
       ['ﬂ', 'fl'],
       ['', ''],
+      [' ', ''],
+      ['•', ''],
+      ['…', ''],
+      ['&', 'and'],
+      ['...', ''],
+      ['e.g.', 'for example'],
+      ['i.e.', 'that is'],
+      ['etc.', 'and so on'],
+      ['vs.', 'versus'],
+      ['vs', 'versus'],
     ]);
 
-    const specialCharactersRegex = new RegExp(Array.from(specialCharactersMapping.keys()).join('|'), 'g');
+    const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const specialCharactersRegex = new RegExp(
+      Array.from(specialCharactersMapping.keys()).map(escapeRegExp).join('|'),
+      'g',
+    );
 
     return text.replace(specialCharactersRegex, (character) => specialCharactersMapping.get(character) || '');
   }
