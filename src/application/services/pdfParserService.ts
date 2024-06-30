@@ -63,27 +63,32 @@ export class PdfParserService {
       console.log({ parsed });
     }
 
-    return parsed.trim().replace(/\s+/g, ' ');
+    return parsed
+      .trim()
+      .replace(/Column \d+/gi, '') // Column 1, Column 2, etc.
+      .replace(/Row \d+/gi, '') // Row 1, Row 2, etc.
+      .replace(/Table \d+/gi, '') // Table 1, Table 2, etc.
+      .replace(/Tab. \d+/gi, '') // Table 1, Table 2, etc.
+      .replace(/Figure \d+/gi, '') // Figure 1, Figure 2, etc.
+      .replace(/Fig. \d+/gi, '') // Figure 1, Figure 2, etc.
+      .replace(/\[[^\]]*\]/g, '') // Remove text inside square brackets
+      .replace(/https?:\/\/\S+|www\.\S+/gi, '') // Remove URLs
+      .replace(/(\{[^\}]+\}@|[A-Za-z0-9._%+-]+@)[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}/g, '') // Remove emails
+      .replace(
+        /(?:ISBN(?:-13)?:?\s*)?(?:97[89][-\s]?)?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d{1,3}/g,
+        '',
+      ) // Remove ISBNs
+      .replace(/(\b\d+\b\s+)+/g, '') // Remove series of numbers
+      .replace(/\b\d+([A-Za-z])/g, '$1') // Remove numbers followed by letters
+      .replace(/[\*+](?=[\s,.])/g, '') // Remove words with special characters
+      .replace(/ \. /g, '. ') // This line replaces "space dot space" with "dot space"
+      .replace(/ \, /g, '. ') // This line replaces "space dot space" with "dot space"
+      .replace(/\s+/g, ' '); // extra spaces
   }
 
   private normalizeText(text: string): string {
     const decodedText = decodeURIComponent(text);
 
-    const cleanedText = decodedText
-      .replace(/Column \d+/g, '') // Column 1, Column 2, etc.
-      .replace(/Row \d+/g, '') // Row 1, Row 2, etc.
-      .replace(/Table \d+/g, '') // Table 1, Table 2, etc.
-      .replace(/\[\d+\]/g, ''); // [1], [2], etc.
-
-    // Check if the text contains only numbers (possibly with spaces)
-    if (/^\s*\d+\s*$/.test(cleanedText)) {
-      return '';
-    }
-
-    return this.replaceSpecialCharacters(cleanedText);
-  }
-
-  private replaceSpecialCharacters(text: string): string {
     const specialCharactersMapping = new Map<string, string>([
       ['Æ', 'AE'],
       ['æ', 'ae'],
@@ -91,26 +96,64 @@ export class PdfParserService {
       ['œ', 'oe'],
       ['ﬁ', 'fi'],
       ['ﬂ', 'fl'],
+      ['©', ''],
       ['', ''],
       [' ', ''],
       ['•', ''],
       ['…', ''],
       ['&', 'and'],
+      ['%', ' percent'],
       ['...', ''],
+      ['..', ''],
+      ['"', ''],
+      ['“', ''],
+      ['”', ''],
+      ['’', ''],
+      ['‘', ''],
+      ['—', '-'],
+      ['–', '-'],
+      ['–', '-'],
       ['e.g.', 'for example'],
       ['i.e.', 'that is'],
       ['etc.', 'and so on'],
       ['vs.', 'versus'],
       ['vs', 'versus'],
+      ['I.', '1.'],
+      ['II.', '2.'],
+      ['III.', '3.'],
+      ['IV.', '4.'],
+      ['V.', '5.'],
+      ['VI.', '6.'],
+      ['VII.', '7.'],
+      ['VIII.', '8.'],
+      ['IX.', '9.'],
+      ['X.', '10.'],
+      ['XI.', '11.'],
+      ['XII.', '12.'],
+      ['XIII.', '13.'],
+      ['XIV.', '14.'],
+      ['XV.', '15.'],
+      ['pp.', 'pages'],
+      ['p.', 'page'],
+      ['fig.', 'figure'],
+      ['vol.', 'volume'],
+      ['ed.', 'edition'],
+      ['no.', 'number'],
+      ['dept.', 'department'],
+      ['1st', 'first'],
+      ['2nd', 'second'],
+      ['3rd', 'third'],
+      ['4th', 'fourth'],
+      ['5th', 'fifth'],
     ]);
 
-    const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapeRegExp = (input: string): string => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     const specialCharactersRegex = new RegExp(
       Array.from(specialCharactersMapping.keys()).map(escapeRegExp).join('|'),
       'g',
     );
 
-    return text.replace(specialCharactersRegex, (character) => specialCharactersMapping.get(character) || '');
+    return decodedText.replace(specialCharactersRegex, (character) => specialCharactersMapping.get(character) || '');
   }
 }
