@@ -64,14 +64,18 @@ export class PdfParserService {
     }
 
     return parsed
-      .trim()
       .replace(/Column \d+/gi, '') // Column 1, Column 2, etc.
       .replace(/Row \d+/gi, '') // Row 1, Row 2, etc.
       .replace(/Table \d+/gi, '') // Table 1, Table 2, etc.
-      .replace(/Tab. \d+/gi, '') // Table 1, Table 2, etc.
+      .replace(/Tab. \d+/gi, '') // Tab. 1, Tab. 2, etc.
       .replace(/Figure \d+/gi, '') // Figure 1, Figure 2, etc.
-      .replace(/Fig. \d+/gi, '') // Figure 1, Figure 2, etc.
+      .replace(/Fig. \d+/gi, '') // Fig. 1, Fig. 2, etc.
+      .replace(/Appendix \d+/gi, '') // Appendix 1, Appendix 2, etc.
+      .replace(/App. \d+/gi, '') // App. 1, App. 2, etc.
+      .replace(/Page\d+/g, '') // Page1, Page2, etc.
       .replace(/\[[^\]]*\]/g, '') // Remove text inside square brackets
+      .replace(/\(\d+\)/g, '') // Remove numbers inside parentheses
+      .replace(/\(\)/g, '') // Remove empty parentheses
       .replace(/https?:\/\/\S+|www\.\S+/gi, '') // Remove URLs
       .replace(/(\{[^\}]+\}@|[A-Za-z0-9._%+-]+@)[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}/g, '') // Remove emails
       .replace(
@@ -83,7 +87,18 @@ export class PdfParserService {
       .replace(/[\*+](?=[\s,.])/g, '') // Remove words with special characters
       .replace(/ \. /g, '. ') // This line replaces "space dot space" with "dot space"
       .replace(/ \, /g, '. ') // This line replaces "space dot space" with "dot space"
-      .replace(/\s+/g, ' '); // extra spaces
+      .replace(/\s+/g, ' ') // extra spaces
+      .replaceAll('-.', '.')
+      .replaceAll(',.', '.')
+      .replaceAll(', .', '.')
+      .replaceAll('.,', '.')
+      .replaceAll('. ,', '.')
+      .replaceAll('. .', '.')
+      .replaceAll('- ', '-')
+      .replaceAll(' -', '-')
+      .replaceAll('...', '.')
+      .replaceAll('..', '.')
+      .trim();
   }
 
   private normalizeText(text: string): string {
@@ -103,8 +118,6 @@ export class PdfParserService {
       ['…', ''],
       ['&', 'and'],
       ['%', ' percent'],
-      ['...', ''],
-      ['..', ''],
       ['"', ''],
       ['“', ''],
       ['”', ''],
@@ -147,7 +160,7 @@ export class PdfParserService {
       ['5th', 'fifth'],
     ]);
 
-    const escapeRegExp = (input: string): string => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapeRegExp = (input: string): string => input.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     const specialCharactersRegex = new RegExp(
       Array.from(specialCharactersMapping.keys()).map(escapeRegExp).join('|'),
