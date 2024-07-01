@@ -17,6 +17,9 @@ const configSchema = Type.Object({
     }),
   }),
   logLevel: Type.Enum(LogLevel),
+  elevenlabs: Type.Object({
+    apiKey: Type.String({ minLength: 1 }),
+  }),
 });
 
 export type Config = Static<typeof configSchema>;

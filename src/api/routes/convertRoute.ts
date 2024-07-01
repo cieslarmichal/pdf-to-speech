@@ -6,10 +6,10 @@ import { promisify } from 'node:util';
 import { v4 as uuid4 } from 'uuid';
 
 import { type Route } from './route.js';
+import { type ConvertPdfToAudioAction } from '../../application/actions/convertPdfToAudioAction.js';
 import { HttpMethod } from '../../common/http/httpMethod.js';
 import { type HttpRouteSchema } from '../../common/http/httpRouteSchema.js';
 import { HttpStatusCode } from '../../common/http/httpStatusCode.js';
-import { type Logger } from '../../common/logger/logger.js';
 
 const streamPipeline = promisify(pipeline);
 
@@ -34,44 +34,35 @@ export class ConvertRoute implements Route {
     },
   };
 
-  public constructor(private readonly logger: Logger) {}
+  public constructor(private readonly convertPdfToAudioAction: ConvertPdfToAudioAction) {}
 
-  public async handler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  public async handler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
     if (!request.isMultipart()) {
-      reply.code(HttpStatusCode.badRequest).send({ error: 'Request is not multipart.' });
-
-      return;
+      return reply.code(HttpStatusCode.badRequest).send({ error: 'Request is not multipart.' });
     }
 
     const multipartFile = await request.file();
 
     if (!multipartFile) {
-      reply.code(HttpStatusCode.badRequest).send({ error: 'No file uploaded.' });
-
-      return;
+      return reply.code(HttpStatusCode.badRequest).send({ error: 'No file uploaded.' });
     }
 
     if (multipartFile.mimetype !== 'application/pdf') {
-      reply.code(HttpStatusCode.badRequest).send({ error: 'Invalid file type.' });
-
-      return;
+      return reply.code(HttpStatusCode.badRequest).send({ error: 'Invalid file type.' });
     }
 
     if (!multipartFile.filename.endsWith('.pdf')) {
-      reply.code(HttpStatusCode.badRequest).send({ error: 'Invalid file extension.' });
-
-      return;
+      return reply.code(HttpStatusCode.badRequest).send({ error: 'Invalid file extension.' });
     }
 
     const filePath = `/tmp/${uuid4()}`;
 
-    this.logger.info({
-      message: 'Converting file',
-      filePath,
-    });
-
     await streamPipeline(multipartFile.file, createWriteStream(filePath));
 
-    reply.code(HttpStatusCode.ok).send({ path: filePath });
+    const { audio } = await this.convertPdfToAudioAction.execute({ pdfPath: filePath });
+
+    reply.code(HttpStatusCode.ok);
+
+    return reply.send(audio);
   }
 }

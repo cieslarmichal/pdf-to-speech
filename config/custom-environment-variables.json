@@ -1,3 +1,6 @@
 {
-  "logLevel": "LOG_LEVEL"
+  "logLevel": "LOG_LEVEL",
+  "elevenlabs": {
+    "apiKey": "ELEVENLABS_API_KEY"
+  }
 }

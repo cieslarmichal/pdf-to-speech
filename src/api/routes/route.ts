@@ -9,5 +9,5 @@ export interface Route {
   readonly url: string;
   readonly schema: HttpRouteSchema;
 
-  handler(request: FastifyRequest, reply: FastifyReply): Promise<void>;
+  handler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply>;
 }
