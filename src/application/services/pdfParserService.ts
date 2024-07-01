@@ -35,14 +35,6 @@ export class PdfParserService {
       let previousText = '';
 
       for (const text of page.Texts) {
-        console.log({
-          text,
-          y: text.y,
-          t: decodeURIComponent(text.R[0]?.T as string),
-        });
-
-        console.log({ previousText });
-
         if (previousText.endsWith(' ') && text.y > previousY) {
           parsed = parsed.trimEnd();
         }
@@ -59,8 +51,6 @@ export class PdfParserService {
 
         previousText = decodeURIComponent(text.R[text.R.length - 1]?.T as string);
       }
-
-      console.log({ parsed });
     }
 
     return parsed
