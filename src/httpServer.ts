@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+
 import { fastifyCors } from '@fastify/cors';
 import { fastifyHelmet } from '@fastify/helmet';
 import { fastifyMultipart } from '@fastify/multipart';
 import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { type TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { fastify, type FastifyInstance } from 'fastify';
+import { type FastifyReply, fastify, type FastifyInstance } from 'fastify';
 import { type FastifySchemaValidationError } from 'fastify/types/schema.js';
 
 import { ConvertRoute } from './api/routes/convertRoute.js';
 import { HealthRoute } from './api/routes/healthRoute.js';
+import { HttpStatusCode } from './api/routes/http/httpStatusCode.js';
+import { ConvertPdfToAudioAction } from './application/actions/convertPdfToAudioAction.js';
+import { PdfParserService } from './application/services/pdfService/pdfParserService.js';
+import { TextToSpeechServiceFactory } from './application/services/textToSpeechService/textToSpeechServiceFactory.js';
 import { BaseError } from './common/errors/baseError.js';
 import { InputNotValidError } from './common/errors/inputNotValidError.js';
-import { HttpStatusCode } from './api/routes/http/httpStatusCode.js';
 import { type Logger } from './common/logger/logger.js';
 import { type Config } from './config.js';
 
@@ -53,6 +57,12 @@ export class HttpServer {
     });
 
     this.fastifyServer.addHook('onSend', (request, reply, _payload, done) => {
+      if (request.url.startsWith('/api/v1/docs')) {
+        done();
+
+        return;
+      }
+
       this.logger.info({
         message: 'HTTP response sent.',
         endpoint: `${request.method} ${request.url}`,
@@ -62,12 +72,18 @@ export class HttpServer {
       done();
     });
 
-    const routes = [new HealthRoute(), new ConvertRoute(this.logger)];
+    const textToSpeechService = TextToSpeechServiceFactory.create({ apiKey: this.config.elevenlabs.apiKey });
+
+    const pdfParserService = new PdfParserService();
+
+    const convertPdfToAudioAction = new ConvertPdfToAudioAction(pdfParserService, textToSpeechService, this.logger);
+
+    const routes = [new HealthRoute(), new ConvertRoute(convertPdfToAudioAction)];
 
     routes.forEach((route): void => {
       this.fastifyServer.route({
         method: route.method,
-        url: route.url,
+        url: `/api/v1${route.url}`,
         handler: route.handler.bind(route),
         schema: {
           description: route.description,
@@ -102,7 +118,7 @@ export class HttpServer {
       });
     });
 
-    this.fastifyServer.setErrorHandler((error, request, reply): void => {
+    this.fastifyServer.setErrorHandler((error, request, reply): FastifyReply => {
       const responseError = {
         name: error.name,
         message: error.message,
@@ -110,9 +126,9 @@ export class HttpServer {
       };
 
       if (error instanceof InputNotValidError) {
-        reply.status(HttpStatusCode.badRequest).send(responseError);
+        reply.status(HttpStatusCode.badRequest);
       } else {
-        reply.status(HttpStatusCode.internalServerError).send(responseError);
+        reply.status(HttpStatusCode.internalServerError);
       }
 
       const debugError = {
@@ -127,6 +143,8 @@ export class HttpServer {
         endpoint: `${request.method} ${request.url}`,
         statusCode: reply.statusCode,
       });
+
+      return reply.send(responseError);
     });
   }
 
@@ -141,7 +159,7 @@ export class HttpServer {
     });
 
     await this.fastifyServer.register(fastifySwaggerUi, {
-      routePrefix: '/api/docs',
+      routePrefix: '/api/v1/docs',
       uiConfig: {
         defaultModelRendering: 'model',
         defaultModelsExpandDepth: 3,

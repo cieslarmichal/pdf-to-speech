@@ -5,11 +5,11 @@ import { pipeline } from 'node:stream';
 import { promisify } from 'node:util';
 import { v4 as uuid4 } from 'uuid';
 
-import { type Route } from './route.js';
-import { type ConvertPdfToAudioAction } from '../../application/actions/convertPdfToAudioAction.js';
 import { HttpMethod } from './http/httpMethod.js';
 import { type HttpRouteSchema } from './http/httpRouteSchema.js';
 import { HttpStatusCode } from './http/httpStatusCode.js';
+import { type Route } from './route.js';
+import { type ConvertPdfToAudioAction } from '../../application/actions/convertPdfToAudioAction.js';
 
 const streamPipeline = promisify(pipeline);
 
@@ -21,9 +21,7 @@ export class ConvertRoute implements Route {
     response: {
       [HttpStatusCode.ok]: {
         description: 'Converted file successfully',
-        ...Type.Object({
-          path: Type.String(),
-        }),
+        ...Type.Object({}),
       },
       [HttpStatusCode.badRequest]: {
         description: 'Invalid file',

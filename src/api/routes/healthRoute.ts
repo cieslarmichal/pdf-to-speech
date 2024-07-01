@@ -1,10 +1,10 @@
 import { Type } from '@sinclair/typebox';
 import { type FastifyReply, type FastifyRequest } from 'fastify';
 
-import { type Route } from './route.js';
 import { HttpMethod } from './http/httpMethod.js';
 import { type HttpRouteSchema } from './http/httpRouteSchema.js';
 import { HttpStatusCode } from './http/httpStatusCode.js';
+import { type Route } from './route.js';
 
 export class HealthRoute implements Route {
   public readonly description = 'Checks application health';
@@ -22,7 +22,7 @@ export class HealthRoute implements Route {
   };
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  public async handler(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    reply.status(HttpStatusCode.ok).send({ healthy: true });
+  public async handler(_request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
+    return reply.status(HttpStatusCode.ok).send({ healthy: true });
   }
 }
