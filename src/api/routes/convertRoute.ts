@@ -7,9 +7,9 @@ import { v4 as uuid4 } from 'uuid';
 
 import { type Route } from './route.js';
 import { type ConvertPdfToAudioAction } from '../../application/actions/convertPdfToAudioAction.js';
-import { HttpMethod } from '../../common/http/httpMethod.js';
-import { type HttpRouteSchema } from '../../common/http/httpRouteSchema.js';
-import { HttpStatusCode } from '../../common/http/httpStatusCode.js';
+import { HttpMethod } from './http/httpMethod.js';
+import { type HttpRouteSchema } from './http/httpRouteSchema.js';
+import { HttpStatusCode } from './http/httpStatusCode.js';
 
 const streamPipeline = promisify(pipeline);
 

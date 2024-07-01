@@ -1,7 +1,7 @@
 import { type FastifyRequest, type FastifyReply } from 'fastify';
 
-import { type HttpMethod } from '../../common/http/httpMethod.js';
-import { type HttpRouteSchema } from '../../common/http/httpRouteSchema.js';
+import { type HttpMethod } from './http/httpMethod.js';
+import { type HttpRouteSchema } from './http/httpRouteSchema.js';
 
 export interface Route {
   readonly description: string;

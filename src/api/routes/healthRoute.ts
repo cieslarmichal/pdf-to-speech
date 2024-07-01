@@ -2,9 +2,9 @@ import { Type } from '@sinclair/typebox';
 import { type FastifyReply, type FastifyRequest } from 'fastify';
 
 import { type Route } from './route.js';
-import { HttpMethod } from '../../common/http/httpMethod.js';
-import { type HttpRouteSchema } from '../../common/http/httpRouteSchema.js';
-import { HttpStatusCode } from '../../common/http/httpStatusCode.js';
+import { HttpMethod } from './http/httpMethod.js';
+import { type HttpRouteSchema } from './http/httpRouteSchema.js';
+import { HttpStatusCode } from './http/httpStatusCode.js';
 
 export class HealthRoute implements Route {
   public readonly description = 'Checks application health';

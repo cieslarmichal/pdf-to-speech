@@ -12,7 +12,7 @@ import { ConvertRoute } from './api/routes/convertRoute.js';
 import { HealthRoute } from './api/routes/healthRoute.js';
 import { BaseError } from './common/errors/baseError.js';
 import { InputNotValidError } from './common/errors/inputNotValidError.js';
-import { HttpStatusCode } from './common/http/httpStatusCode.js';
+import { HttpStatusCode } from './api/routes/http/httpStatusCode.js';
 import { type Logger } from './common/logger/logger.js';
 import { type Config } from './config.js';
 
